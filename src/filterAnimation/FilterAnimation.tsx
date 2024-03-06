@@ -8,12 +8,8 @@ const FilterAnimation = () => {
   const [data, setData] = useState([]);
   const [active, setActive] = useState("all");
   const [products, setProducts] = useState([]);
-  //   extract uniqe category for create filter button
-  //   const categories = data.map((item: Tproduct) => item.category);
-  //   const uniqueCategory = [...new Set(categories)];
-  //   uniqueCategory.unshift("all");
-  //   console.log(uniqueCategory);
 
+  // handle category activation
   const handleActive = (categoryName: string) => {
     setActive(categoryName);
     const filteredData = data.filter((item: Tproduct) => {
@@ -23,23 +19,22 @@ const FilterAnimation = () => {
         return item;
       }
     });
-    console.log({ filteredData, active });
 
     setProducts(filteredData);
   };
 
+  // Fetch product data
   useEffect(() => {
-    fetch("https://dummyjson.com/products")
+    fetch("product.json")
       .then((res) => res.json())
       .then((data) => {
-        setData(data.products);
-        setProducts(data.products);
+        setData(data);
+        setProducts(data);
       });
-    console.log("render");
   }, []);
 
   return (
-    <div className="md:my-24 my-14 p-4">
+    <div className=" my-10 p-4 lg:p-0">
       <div className="flex justify-center gap-4 flex-wrap">
         {/* category buttons */}
         {uniqueCategory.map((categoryName) => (
@@ -57,23 +52,10 @@ const FilterAnimation = () => {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  gap-4 mt-10 max-w-5xl w-full mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-4 mt-10 max-w-6xl w-full mx-auto">
         {/* card */}
         {products.map((item: Tproduct) => (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            layout
-            key={item.id}
-          >
-            <img
-              className="w-full  h-[250px] object-cover rounded-md"
-              src={item.thumbnail}
-              alt=""
-            />
-            <h1 className="text-xl text-blue-700 ">{item.category}</h1>
-          </motion.div>
+          <Card product={item} key={item.id} />
         ))}
       </div>
     </div>
@@ -81,3 +63,58 @@ const FilterAnimation = () => {
 };
 
 export default FilterAnimation;
+
+const Card = ({ product }: { product: Tproduct }) => {
+  //animation variants
+  const imageVariants = {
+    initial: { x: -100, opacity: 0 },
+    whileInView: {
+      x: 0,
+      rotate: [20, 0],
+      opacity: 1,
+      transition: {
+        duration: 2,
+        type: "spring",
+        bounce: "0.5",
+      },
+    },
+  };
+
+  const textVariants = {
+    initial: { y: 50, opacity: 0 },
+    whileInView: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 1, type: "spring", bounce: "0.5" },
+    },
+  };
+  return (
+    <motion.div
+      initial="initial"
+      whileInView="whileInView"
+      transition={{ staggerChildren: 0.5 }}
+      layout
+      key={product.id}
+      className="p-6 bg-slate-100 rounded-lg space-y-4 overflow-hidden"
+    >
+      <motion.img
+        variants={imageVariants}
+        className="w-full  h-[250px] rounded-md"
+        src={product.image}
+        alt=""
+      />
+      <motion.h1
+        variants={textVariants}
+        className="text-3xl italic text-slate-700 truncate font-medium "
+      >
+        {product.title}
+      </motion.h1>
+      <motion.p
+        variants={textVariants}
+        className="text-xl text-slate-700 font-medium  "
+      >
+        {product.description.split(" ").slice(0, 5).join(" ")}
+      </motion.p>
+    </motion.div>
+  );
+};

@@ -1,1 +1,7 @@
-export const uniqueCategory = ['all', 'smartphones', 'laptops', 'fragrances', 'skincare', 'groceries', 'home-decoration']
+export const uniqueCategory = [
+    'all',
+    "electronics",
+    "jewelery",
+    "men's clothing",
+    "women's clothing"
+]
