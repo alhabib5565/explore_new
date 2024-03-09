@@ -1,10 +1,13 @@
 import { DragEvent, useState } from "react";
+import { motion } from "framer-motion";
+import { FaFire, FaTrashCan } from "react-icons/fa6";
 
 type TTask = {
   title: string;
   id: string;
   status: string;
 };
+
 type TColumn = {
   status: string;
   headingColor: string;
@@ -14,14 +17,15 @@ type TColumn = {
 };
 
 type TDeleteProps = Pick<TColumn, "setTask" | "tasks">;
+type TAddTaskPros = Pick<TColumn, "setTask" | "tasks" | "status">;
 
 const onDragStart = (event: DragEvent<HTMLElement>, task: TTask) => {
-  event.dataTransfer.setData("Task", task.id);
+  event.dataTransfer.setData("TaskId", task.id);
 };
 
 const TaskManager = () => {
   return (
-    <div className="min-h-screen w-full h-full bg-neutral-800 text-neutral-50">
+    <div className="min-h-screen w-full pt-10 px-10 h-full bg-neutral-800 text-neutral-50">
       <AllColumns />
     </div>
   );
@@ -30,7 +34,7 @@ const TaskManager = () => {
 const AllColumns = () => {
   const [tasks, setTasks] = useState(default_tasks);
   return (
-    <div className="flex justify-between gap-4 lg:gap-8">
+    <div className="flex justify-between gap-4 ">
       <SingleColumn
         tasks={tasks}
         setTask={setTasks}
@@ -64,33 +68,133 @@ const AllColumns = () => {
   );
 };
 
-const SingleColumn = ({ headingColor, tasks, title, status }: TColumn) => {
+const SingleColumn = ({
+  headingColor,
+  tasks,
+  title,
+  status,
+  setTask,
+}: TColumn) => {
+  const [active, setActive] = useState(false);
+
+  const onDragOver = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    setActive(true);
+  };
+
+  const onDragLeave = () => {
+    setActive(false);
+  };
+
+  const onDragEnd = (event: DragEvent<HTMLElement>) => {
+    const dragableElementId = event.dataTransfer.getData("TaskId");
+    const allTasks = [...tasks];
+    const dragableElement = allTasks.find(
+      (task) => task.id === dragableElementId
+    );
+    dragableElement!.status = status;
+
+    setTask(allTasks);
+    setActive(false);
+  };
+
   const filteredTask = tasks.filter((task) => task.status === status);
   return (
     <div className=" w-full">
-      <div className="flex justify-between items-center p-3 rounded-md bg-neutral-700 border-2 border-neutral-500">
+      <div className="flex justify-between items-center p-3 rounded-md bg-neutral-700/40 border-2 border-neutral-500">
         <h2 className={`text-2xl font-bold capitalize ${headingColor}`}>
           {title}
         </h2>
         <p className="text-sm text-neutral-400">{filteredTask.length}</p>
       </div>
-      <div className="mt-2 space-y-4">
+      <motion.div
+        // layout
+        onDragOver={(e) => onDragOver(e)}
+        onDragLeave={onDragLeave}
+        onDrop={(e) => onDragEnd(e)}
+        className={`mt-2 space-y-4 min-h-[calc(100vh-110px)] ${
+          active && "bg-neutral-500/10 "
+        }`}
+      >
         {filteredTask.map((task) => (
           <Card {...task} key={task.id} />
         ))}
-      </div>
+        <AddTask tasks={tasks} setTask={setTask} status={status} />
+      </motion.div>
     </div>
   );
 };
 
 const Card = ({ title, id, status }: TTask) => {
   return (
-    <div
-      onDragStart={(e) => onDragStart(e, { id, title, status })}
-      draggable={true}
-      className="p-3 rounded-md border border-neutral-400 cursor-grab active:cursor-grabbing active:scale-95 duration-200"
-    >
-      <p className="text-sm">{title}</p>
+    <motion.div layout>
+      <div
+        onDragStart={(e) => onDragStart(e, { id, title, status })}
+        draggable={true}
+        className="p-3 rounded-md border border-neutral-400 bg-neutral-600/50 cursor-grab active:cursor-grabbing active:scale-95 duration-200"
+      >
+        <p className="text-sm">{title}</p>
+      </div>
+    </motion.div>
+  );
+};
+
+const AddTask = ({ status, tasks, setTask }: TAddTaskPros) => {
+  const [inputShow, setInputShow] = useState(false);
+  const [text, setText] = useState("");
+  const handleInputShow = () => {
+    setInputShow(!inputShow);
+  };
+
+  const handleAddTask = () => {
+    if (!text) {
+      return alert("Please write");
+    }
+    const task = [
+      ...tasks,
+      {
+        id: Math.floor((Math.random() + 20) * 1000).toString(),
+        status: status,
+        title: text,
+      },
+    ];
+    setTask(task);
+    setInputShow(false);
+  };
+  return (
+    <div>
+      {inputShow ? (
+        <motion.div layout>
+          <textarea
+            autoFocus
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Add Task..."
+            className="w-full rounded border-2 border-violet-800/50 focus:border-violet-400 bg-violet-400/20 p-3 text-sm text-neutral-50 placeholder-violet-300 focus:outline-0"
+          />
+          <div className="flex justify-end items-center gap-4">
+            <button
+              onClick={handleInputShow}
+              className="text-neutral-400 hover:text-neutral-200"
+            >
+              Close
+            </button>
+            <button
+              onClick={handleAddTask}
+              className="px-2 py-1 rounded-md bg-neutral-100 hover:bg-neutral-200 transition-all text-neutral-600"
+            >
+              Add +
+            </button>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.button
+          layout
+          onClick={handleInputShow}
+          className="text-neutral-400 hover:text-neutral-200"
+        >
+          Add Task +
+        </motion.button>
+      )}
     </div>
   );
 };
@@ -98,8 +202,7 @@ const Card = ({ title, id, status }: TTask) => {
 const DeleteCard = ({ tasks, setTask }: TDeleteProps) => {
   const [active, setActive] = useState(false);
   const onDragEnd = (event: DragEvent<HTMLElement>) => {
-    console.log(event, "sdfsfs");
-    const deleteTaskId = event.dataTransfer.getData("Task");
+    const deleteTaskId = event.dataTransfer.getData("TaskId");
     const remaingingTasks = tasks.filter((task) => task.id !== deleteTaskId);
     setTask(remaingingTasks);
     setActive(false);
@@ -118,10 +221,14 @@ const DeleteCard = ({ tasks, setTask }: TDeleteProps) => {
       onDrop={(e) => onDragEnd(e)}
       onDragOver={(e) => onDragOver(e)}
       onDragLeave={onDragLeave}
-      className={`h-[200px] w-full bg-neutral-700/70 border rounded-md ${
-        active ? "border-red-600 bg-red-500/15 text-red-600" : ""
+      className={` grid h-56 w-56 shrink-0 place-content-center rounded border text-3xl ${
+        active
+          ? "border-red-800 bg-red-800/20 text-red-500"
+          : "border-neutral-500 bg-neutral-500/20 text-neutral-500"
       }`}
-    ></div>
+    >
+      {active ? <FaFire className="animate-bounce" /> : <FaTrashCan />}
+    </div>
   );
 };
 
