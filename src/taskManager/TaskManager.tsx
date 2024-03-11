@@ -158,6 +158,7 @@ const AddTask = ({ status, tasks, setTask }: TAddTaskPros) => {
         title: text,
       },
     ];
+    setText("");
     setTask(task);
     setInputShow(false);
   };
