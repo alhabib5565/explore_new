@@ -1,6 +1,8 @@
 // import FilterAnimation from "./filterAnimation/FilterAnimation";
 // import TaskManager from "./taskManager/TaskManager";
-import Accordion from "./accordion/Accordion";
+// import Accordion from "./accordion/Accordion";
+
+import ImageSlider from "./ImageSlider/ImageSlider";
 
 const App = () => {
   return (
@@ -8,7 +10,8 @@ const App = () => {
       {/* <Loader /> */}
       {/* <FilterAnimation /> */}
       {/* <TaskManager /> */}
-      <Accordion />
+      {/* <Accordion /> */}
+      <ImageSlider />
     </div>
     // <div className="bg-zinc-900 h-screen w-full flex justify-center items-center">
     //   <AnimatedLinks />
