@@ -2,7 +2,9 @@
 // import TaskManager from "./taskManager/TaskManager";
 // import Accordion from "./accordion/Accordion";
 
-import ImageSlider from "./ImageSlider/ImageSlider";
+import CurrencyConverter from "./currencyConverter/CurrencyConverter";
+
+// import ImageSlider from "./ImageSlider/ImageSlider";
 
 const App = () => {
   return (
@@ -11,7 +13,8 @@ const App = () => {
       {/* <FilterAnimation /> */}
       {/* <TaskManager /> */}
       {/* <Accordion /> */}
-      <ImageSlider />
+      {/* <ImageSlider /> */}
+      <CurrencyConverter />
     </div>
     // <div className="bg-zinc-900 h-screen w-full flex justify-center items-center">
     //   <AnimatedLinks />
