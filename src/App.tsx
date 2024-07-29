@@ -2,7 +2,9 @@
 // import TaskManager from "./taskManager/TaskManager";
 // import Accordion from "./accordion/Accordion";
 
-import CurrencyConverter from "./currencyConverter/CurrencyConverter";
+import GetFormatedInputValue from "./getFormatedInputValue/GetFormatedInputValue";
+
+// import CurrencyConverter from "./currencyConverter/CurrencyConverter";
 
 // import ImageSlider from "./ImageSlider/ImageSlider";
 
@@ -14,7 +16,8 @@ const App = () => {
       {/* <TaskManager /> */}
       {/* <Accordion /> */}
       {/* <ImageSlider /> */}
-      <CurrencyConverter />
+      {/* <CurrencyConverter /> */}
+      <GetFormatedInputValue />
     </div>
     // <div className="bg-zinc-900 h-screen w-full flex justify-center items-center">
     //   <AnimatedLinks />
