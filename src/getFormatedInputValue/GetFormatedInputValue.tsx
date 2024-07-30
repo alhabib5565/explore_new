@@ -1,15 +1,43 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 
+type TFormData = {
+  fullName: string;
+  bloadGroup: string;
+};
+
 const GetFormatedInputValue = () => {
-  const [formData, setFormData] = useState({ fullName: "", bloadGroup: "" });
+  const [formData, setFormData] = useState<TFormData>({
+    fullName: "",
+    bloadGroup: "",
+  });
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputName = event.target.name;
     const inputValue = event.target.value;
 
+    console.log(inputValue);
+
+    let value: string = "";
+
+    switch (inputName) {
+      case "fullName":
+        {
+          value = inputValue
+            .split(" ")
+            .map((text) => text[0] && text[0].toUpperCase() + text.slice(1))
+            .join(" ");
+        }
+        break;
+      case "bloadGroup":
+        value = inputValue.toUpperCase();
+        break;
+
+      default:
+        break;
+    }
     setFormData((prevState) => ({
       ...prevState,
-      [inputName]: inputValue,
+      [inputName]: value,
     }));
   };
 
@@ -76,3 +104,67 @@ const GetFormatedInputValue = () => {
 };
 
 export default GetFormatedInputValue;
+
+/*import { ChangeEvent, FormEvent, useReducer } from "react";
+
+type TFormData = {
+  fullName: string;
+  bloadGroup: string;
+};
+
+const initialState = {
+  fullName: "",
+  bloadGroup: "",
+};
+
+const reducer = (
+  state: TFormData,
+  action: { inputName: string; inputValue: string }
+) => {
+  switch (action.inputName) {
+    case "fullName": {
+      const value = action.inputValue
+        .split(" ")
+        .map((text: string) => text[0] && text[0].toUpperCase() + text.slice(1))
+        .join(" ");
+      return {
+        ...state,
+        [action.inputName]: value,
+      };
+    }
+    case "bloadGroup":
+      return {
+        ...state,
+        [action.inputName]: action.inputValue.toUpperCase(),
+      };
+
+    default:
+      break;
+  }
+};
+
+const GetFormatedInputValue = () => {
+  const [formData, dispatch] = useReducer(reducer, initialState);
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputName = event.target.name;
+    const inputValue = event.target.value;
+
+    dispatch({ inputName, inputValue });
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(formData);
+  };
+
+  console.log("render");
+
+  return (
+    <div className="bg-[#EDF2F7] grid place-items-center h-screen">
+      </div>
+  );
+};
+
+export default GetFormatedInputValue;
+*/
