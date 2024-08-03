@@ -1,48 +1,47 @@
 import { useEffect, useState } from "react";
 import { Tproduct } from "./filter.type";
-import { uniqueCategory } from "./constant";
 import { motion } from "framer-motion";
+import useGetAllCategories from "./hooks/useGetAllCategories";
+import Pagination from "./Pagination";
 
 const FilterAnimation = () => {
   // state
-  const [data, setData] = useState([]);
-  const [active, setActive] = useState("all");
-  const [products, setProducts] = useState([]);
+  const [paginationInfo, setPaginationInfo] = useState({ limit: 20, skip: 0 });
+  const [activeCategory, setActiveCategory] = useState("");
+  const [productsData, setProductsData] = useState({
+    products: [],
+    total: 0,
+  });
+  const categories = useGetAllCategories();
+
+  console.log(productsData);
 
   // handle category activation
   const handleActive = (categoryName: string) => {
-    setActive(categoryName);
-    const filteredData = data.filter((item: Tproduct) => {
-      if (categoryName !== "all") {
-        return item.category === categoryName;
-      } else {
-        return item;
-      }
-    });
-
-    setProducts(filteredData);
+    setActiveCategory(categoryName);
   };
 
   // Fetch product data
   useEffect(() => {
-    fetch("product.json")
+    fetch(
+      `https://dummyjson.com/products?limit=${paginationInfo.limit}&skip=${paginationInfo.skip}`
+    )
       .then((res) => res.json())
       .then((data) => {
-        setData(data);
-        setProducts(data);
+        setProductsData(data);
       });
-  }, []);
+  }, [paginationInfo.limit, paginationInfo.skip]);
 
   return (
     <div className=" my-10 p-4 lg:p-0">
       <div className="flex justify-center gap-4 flex-wrap">
         {/* category buttons */}
-        {uniqueCategory.map((categoryName) => (
+        {categories.map((categoryName) => (
           <button
             key={categoryName}
             onClick={() => handleActive(categoryName)}
             className={`${
-              active === categoryName
+              activeCategory === categoryName
                 ? "bg-blue-700 text-white"
                 : "bg-transparent text-blue-700"
             } px-3 py-1  rounded-md border-2 capitalize relative border-blue-700 group font-medium hover:text-white z-10`}
@@ -52,12 +51,19 @@ const FilterAnimation = () => {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-4 mt-10 max-w-6xl w-full mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  gap-4 mt-10 max-w-6xl w-full mx-auto">
         {/* card */}
-        {products.map((item: Tproduct) => (
+        {productsData.products.map((item: Tproduct) => (
           <Card product={item} key={item.id} />
         ))}
       </div>
+
+      <Pagination
+        limit={paginationInfo.limit}
+        skip={paginationInfo.skip}
+        totalItems={productsData.total}
+        setPaginationInfo={setPaginationInfo}
+      />
     </div>
   );
 };
@@ -99,22 +105,24 @@ const Card = ({ product }: { product: Tproduct }) => {
     >
       <motion.img
         variants={imageVariants}
-        className="w-full  h-[250px] rounded-md"
-        src={product.image}
+        className="w-full  h-[200px] rounded-md"
+        src={product.thumbnail}
         alt=""
       />
-      <motion.h1
-        variants={textVariants}
-        className="text-3xl italic text-slate-700 truncate font-medium "
-      >
-        {product.title}
-      </motion.h1>
-      <motion.p
-        variants={textVariants}
-        className="text-xl text-slate-700 font-medium  "
-      >
-        {product.description.split(" ").slice(0, 5).join(" ")}
-      </motion.p>
+      <div className="">
+        <motion.h1
+          variants={textVariants}
+          className="text-[16px] text-slate-700 truncate font-bold "
+        >
+          {product.title}
+        </motion.h1>
+        <motion.p
+          variants={textVariants}
+          className="text-[16px] text-slate-700  "
+        >
+          {product.description.split(" ").slice(0, 5).join(" ")}
+        </motion.p>
+      </div>
     </motion.div>
   );
 };
