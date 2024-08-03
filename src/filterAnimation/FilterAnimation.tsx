@@ -3,6 +3,7 @@ import { Tproduct } from "./filter.type";
 import { motion } from "framer-motion";
 import useGetAllCategories from "./hooks/useGetAllCategories";
 import Pagination from "./Pagination";
+import AutoComplete from "../autoComplete/AutoComplete";
 
 const FilterAnimation = () => {
   // state
@@ -13,8 +14,6 @@ const FilterAnimation = () => {
     total: 0,
   });
   const categories = useGetAllCategories();
-
-  console.log(productsData);
 
   // handle category activation
   const handleActive = (categoryName: string) => {
@@ -32,8 +31,24 @@ const FilterAnimation = () => {
       });
   }, [paginationInfo.limit, paginationInfo.skip]);
 
+  const fetchSuggetions = async (inputValue: string) => {
+    if (inputValue) {
+      const response = await fetch(
+        `https://dummyjson.com/products/search?q=${inputValue}`
+      );
+      const data = await response.json();
+
+      return data.products;
+    } else {
+      return [];
+    }
+  };
+
   return (
-    <div className=" my-10 p-4 lg:p-0">
+    <div className="mb-10 p-4 lg:p-0">
+      <div className="border-b-2 py-4 flex justify-center mb-10">
+        <AutoComplete fetchSuggetions={fetchSuggetions} />
+      </div>
       <div className="flex justify-center gap-4 flex-wrap">
         {/* category buttons */}
         {categories.map((categoryName) => (

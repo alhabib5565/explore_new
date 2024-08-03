@@ -1,4 +1,5 @@
-import { ChangeEvent, Dispatch } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { ChangeEvent, Dispatch, memo } from "react";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 
 type TPaginationProps = {
@@ -19,8 +20,6 @@ const Pagination = ({
   limit,
   setPaginationInfo,
 }: TPaginationProps) => {
-  console.log(totalItems, limit, skip);
-
   const totalPageNumber = [...Array(Math.ceil(totalItems / limit)).keys()];
   const options = [10, 20, 30, 40, 100];
 
@@ -61,6 +60,7 @@ const Pagination = ({
         totalPageNumber.map((pageNumber) => (
           <button
             onClick={() => handlePageChage(pageNumber)}
+            key={pageNumber}
             className={`size-10 border-2 border-blue-500  rounded-full ${
               skip === pageNumber ? "bg-blue-500 text-white" : "bg-transparent"
             }`}
@@ -91,4 +91,5 @@ const Pagination = ({
   );
 };
 
-export default Pagination;
+// eslint-disable-next-line react-refresh/only-export-components
+export default memo(Pagination);
